@@ -26,7 +26,7 @@ LineMandelCalculator::LineMandelCalculator (unsigned matrixBaseSize, unsigned li
 	data = (int *)(aligned_alloc(alignment, size + padding));
 	int *pdata = data;
 	// Pre-fill with `limit`
-	#pragma omp simd aligned(pdata : 64) simdlen(64)
+	#pragma omp simd aligned(pdata : 64) simdlen(32)
 	for (size_t i = 0; i < width * height; i++) {
 		pdata[i] = limit;
 	}
@@ -75,7 +75,7 @@ int * LineMandelCalculator::calculateMandelbrot () {
 
 		for (int k = 0; (k < limit) && (acc < width); k++)
 		{
-			#pragma omp simd simdlen(64) \
+			#pragma omp simd simdlen(32) \
 					aligned(plimitLock, pdata, pzImags, pzReals : 64) \
 					reduction(+ : acc)
 			for (int j = 0; j < width; j++)
