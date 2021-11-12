@@ -1,8 +1,8 @@
 #!/bin/bash
 #PBS -q qexp
-#PBS -A OPEN-20-37
-#PBS -l select=1:ncpus=36,vtune=2020_update3-GCC 
-#PBS -l walltime=0:05:00
+#PBS -A dd-21-22
+#PBS -l select=1:ncpus=36 
+#PBS -l walltime=0:15:00
 #PBS -m e
 #PBS -N AVS-evaluate
 
@@ -23,6 +23,7 @@ SHAPES=(512 1024 2048 4096)
 ITERS=(100 1000)
 CALCULATORS=("ref" "line" "batch")
 
+i=0
     for calc in "${CALCULATORS[@]}"; do
         for run in `seq 3`; do
             (
@@ -36,6 +37,7 @@ CALCULATORS=("ref" "line" "batch")
             echo $p
             pids[${i}]=$p
             echo "pids" ${pids[*]}
+            i=$((i+1)) 
         done
     done
 
