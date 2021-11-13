@@ -2,24 +2,36 @@
 
 1. Proč je nutné určovat, zda má výpočet pokračovat?
 ==============================================================================
-
+Z dôvodu rýchleho stúpania absolútnej hodnoty komplexného čísla pri
+prekročení prahu. Chceme prvú iteráciu, v ktorej sa prekročí prah, nie tú,
+v ktorej hodnota konverguje do nekonečna.
+Je vhodné si tiež pamätať koľko hodnôt už malo ukončený výpočet,
+vďaka čomu je možné predčasne ukončiť iterovanie pre daný riadok,
+čím by sa mala skrátiť celková doba výpočtu.
 
 2. Byla "Line" vektorizace efektivní? Proč?
 ==============================================================================
-
+Nie, pretože je stále primárne brzdená pamäťou.
 
 3. Jaká byla dosažena výkonnost v Intel Advisoru pro jednotlivé implementace 
 (v GFLOPS)?
 ==============================================================================
-
+Line: 19.75
+Batch: 18.04
 
 4. Jaká část kódu byla paralizována v "Line" implementaci? Vyčteme tuto 
 informaci i u batch kalkulátoru?
 ==============================================================================
+Najvnorenejší cyklus, ktorý cyklí cez celý riadok.
+Podľa výstupu v .optrpt, rovnaká časť kódu aj v Batch impelemntácii.
 
 
 5. Co vyčteme z Roofline modelu pro obě vektorizované implementace?
 ==============================================================================
+Line implementácia má oproti Batch horšie využitie pamäte.
+Obe implementácie sú nad výpočtovým prahom skalárneho sčítania.
+Obe implementácie sú hlboko v šírke pásma L3 cache, čo značí prínos zámeny
+poradia cyklov výpočtu.
 
 
 
