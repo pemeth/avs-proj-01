@@ -112,5 +112,84 @@ int * BatchMandelCalculator::calculateMandelbrot () {
 		}
 	}
 
+	// If width and height are not divisible by blockSize,
+	// then the remaining incomplete blocks at the ends of rows and columns
+	// need to be calculated separately.
+
+	const int heightRemainder = (height / blockSize) * blockSize;
+	const int widthRemainder = (width / blockSize) * blockSize;
+
+	for (int i = 0, acc = 0; i < heightRemainder; i++, acc = 0)
+	{
+		// Fixes alignment issue in the vectorized loop
+		int *pdata = data + i * width;
+
+		for (int k = 0; (k < limit) && (acc < widthRemainder); k++)
+		{
+			#pragma omp simd \
+					aligned(plimitLock, pdata, pzImags, pzReals : 64) \
+					reduction(+ : acc)
+			for (int j = widthRemainder; j < width; j++)
+			{
+				// The first `limit` iteration is unique
+				pzReals[j] = k == 0 ? f_x_start + j * f_dx : pzReals[j];
+				pzImags[j] = k == 0 ? f_y_start + i * f_dy : pzImags[j];
+				plimitLock[j] = k == 0 ? true : plimitLock[j];
+
+				float r2 = pzReals[j] * pzReals[j];
+				float i2 = pzImags[j] * pzImags[j];
+
+				acc += r2 + i2 > 4.0f && plimitLock[j];
+
+				pdata[j] = r2 + i2 > 4.0f && plimitLock[j]
+					? k
+					: pdata[j];
+				plimitLock[j] = r2 + i2 > 4.0f && plimitLock[j]
+					? false
+					: plimitLock[j];
+
+				pzImags[j] =
+					2.0f * pzReals[j] * pzImags[j] + (f_y_start + i * f_dy);
+				pzReals[j] = r2 - i2 + (f_x_start + j * f_dx);
+			}
+		}
+	}
+
+	for (int i = heightRemainder, acc = 0; i < height; i++, acc = 0)
+	{
+		// Fixes alignment issue in the vectorized loop
+		int *pdata = data + i * width;
+
+		for (int k = 0; (k < limit) && (acc < width); k++)
+		{
+			#pragma omp simd \
+					aligned(plimitLock, pdata, pzImags, pzReals : 64) \
+					reduction(+ : acc)
+			for (int j = 0; j < width; j++)
+			{
+				// The first `limit` iteration is unique
+				pzReals[j] = k == 0 ? f_x_start + j * f_dx : pzReals[j];
+				pzImags[j] = k == 0 ? f_y_start + i * f_dy : pzImags[j];
+				plimitLock[j] = k == 0 ? true : plimitLock[j];
+
+				float r2 = pzReals[j] * pzReals[j];
+				float i2 = pzImags[j] * pzImags[j];
+
+				acc += r2 + i2 > 4.0f && plimitLock[j];
+
+				pdata[j] = r2 + i2 > 4.0f && plimitLock[j]
+					? k
+					: pdata[j];
+				plimitLock[j] = r2 + i2 > 4.0f && plimitLock[j]
+					? false
+					: plimitLock[j];
+
+				pzImags[j] =
+					2.0f * pzReals[j] * pzImags[j] + (f_y_start + i * f_dy);
+				pzReals[j] = r2 - i2 + (f_x_start + j * f_dx);
+			}
+		}
+	}
+
 	return data;
 }
