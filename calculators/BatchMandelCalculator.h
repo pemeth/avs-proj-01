@@ -2,7 +2,7 @@
  * @file BatchMandelCalculator.h
  * @author Patrik Nemeth <xnemet04@stud.fit.vutbr.cz>
  * @brief Implementation of Mandelbrot calculator that uses SIMD paralelization over small batches
- * @date 11.11.2021
+ * @date 13.11.2021
  */
 #ifndef BATCHMANDELCALCULATOR_H
 #define BATCHMANDELCALCULATOR_H
