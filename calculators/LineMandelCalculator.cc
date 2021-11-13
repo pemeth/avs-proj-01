@@ -75,7 +75,7 @@ int * LineMandelCalculator::calculateMandelbrot () {
 
 		for (int k = 0; (k < limit) && (acc < width); k++)
 		{
-			#pragma omp simd simdlen(32) \
+			#pragma omp simd \
 					aligned(plimitLock, pdata, pzImags, pzReals : 64) \
 					reduction(+ : acc)
 			for (int j = 0; j < width; j++)

@@ -80,7 +80,7 @@ int * BatchMandelCalculator::calculateMandelbrot () {
 
 				for (int k = 0; (k < limit) && (acc < blockSize); k++)
 				{
-					#pragma omp simd simdlen(64) \
+					#pragma omp simd \
 							aligned(plimitLock, pdata, pzImags, pzReals : 64) \
 							reduction(+ : acc)
 					for (int j = 0; j < blockSize; j++)
